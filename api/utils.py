@@ -11,5 +11,5 @@ def date_transform(obj):
         date_obj = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
         return date_obj
     
-    return obj.strftime("%Y-%m-%dT%H:%M:%S.000")
+    return obj.strftime("%Y-%m-%d %H:%M:%S.000")
     

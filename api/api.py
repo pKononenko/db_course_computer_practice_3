@@ -9,6 +9,7 @@ from flask_praetorian import Praetorian
 from dotenv import load_dotenv
 
 
+# Load env files
 load_dotenv()
 
 app = Flask(__name__)
@@ -18,6 +19,7 @@ CORS(app)
 
 from models import User, Deadline
 
+# For local usage with .env file
 DATABASE = os.getenv('DATABASE')
 DATABASE_USERNAME = os.getenv('DATABASE_USER')
 DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
@@ -26,6 +28,7 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['JWT_ACCESS_LIFESPAN'] = {'hours': 24}
 app.config['JWT_REFRESH_LIFESPAN'] = {'days': 30}
 
+# If we use heroku
 if os.environ.get('DATABASE_URL') is not None:
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 else:
@@ -37,10 +40,10 @@ guard.init_app(app, User)
 
 with app.app_context():
     db.create_all()
-    if not db.session.query(User).filter_by(username='Yasoob').count():
+    if not db.session.query(User).filter_by(username='Paul').count():
         db.session.add(User(
-          username='Yasoob',
-          password=guard.hash_password('strongpassword'),
+          username='Paul',
+          password=guard.hash_password('123abc'),
           roles = 'admin'
             ))
     db.session.commit()

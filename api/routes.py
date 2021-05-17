@@ -128,19 +128,24 @@ def update_deadline():
 
     date_obj = date_transform(date)
     
+    successful_bool = True
     deadline = Deadline.query.filter_by(deadline_id = deadline_id).first()
 
     try:
         deadline.subject = subject
-        deadline.task_name = task_name
-        deadline.description = description
-        deadline.date = date
+        deadline.deadline_name = task_name
+        deadline.deadline_desc = description
+        deadline.deadline_date = date
 
         db.session.commit()
     except:
+        successful_bool = False
         db.session.rollback()
 
-    ret = {'message': 2000}
+    if not successful_bool:
+        return {'message': 'Problems with updating deadline.'}
+
+    ret = {'message': 'OK', 'deadline_date': date_transform(date)}
     return ret, 200
 
 @app.route('/api/get_deadlines', methods=["GET"])
@@ -151,6 +156,6 @@ def get_deadlines():
     deadlines_dict = {}
     for num, deadline in enumerate(user_deadlines):
         deadlines_dict[f'Deadline {num + 1}'] = {k: v for k, v in deadline.__dict__.items() if k not in ('user_id', '_sa_instance_state', 'deadline_date')}
-        deadlines_dict[f'Deadline {num + 1}']['deadline_date'] = date_transform(deadline.deadline_date)
+        deadlines_dict[f'Deadline {num + 1}']['deadline_date'] = deadline.deadline_date
     print(deadlines_dict)
     return jsonify(deadlines_dict)
