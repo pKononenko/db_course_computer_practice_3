@@ -1,38 +1,80 @@
-.App {
-  text-align: center;
+h2 {
+    text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.container {
+    margin: -0.5% 1% -0.5% 1%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.centered-div-form {
+    padding: 1% 1% 1% 1%;
+    border: 1px solid grey;
+    border-radius: 15px;
+    width: 30%;
+    margin: 8% auto;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.btn-st {
+    border-radius: 30px;
 }
 
-.App-link {
-  color: #61dafb;
+input[type="text"],
+input[type="password"],
+select.form-control {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #000000;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border-radius: 0;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+input[type="text"]:focus,
+input[type="password"]:focus,
+select.form-control:focus {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.textarea-style {
+    background: transparent;
+    border: none;
+    border: 0.4px solid #eeeded;
+    border-bottom: 1px solid #000000;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.datePicker {
+    width: 100%;
+}
+
+.deadlines-area {
+    margin-top: 5%;
+    margin-bottom: 2%;
+    position: relative;
+}
+
+.card {
+    margin-bottom: 2%;
+}
+
+.navbar-nav {
+    margin-left: auto;
+}
+
+.btn-bt-r {
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    margin: 0 3% 3% 0;
+}
+
+.nav-items-margin {
+    margin: -0.5% 0 -0.5% 0;
+}
+
+.card-header-color-g {
+    background-color: #e1e1e1;
 }
