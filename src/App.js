@@ -12,7 +12,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Modal from 'react-modal';
 
-//Modal.setAppElement("#root");
+Modal.setAppElement("#root");
 function App() {
   const [logged] = useAuth();
 
@@ -121,10 +121,23 @@ function Home() {
       })
   }
 
+  // Delete 
   const deleteDeadline = (index) => {
     const newDeadlinesList = [...deadlines_list];
     newDeadlinesList.splice(index, 1);
     setDeadlinesList(newDeadlinesList);
+  }
+
+  // Modify
+  const modifyDeadline = (props) => {
+    deleteDeadline(props.index);
+    setDeadlinesList(deadlines_list => [...deadlines_list, 
+      {deadline_name: props.task_name,
+       deadline_id: props.deadline_id,
+       deadline_subject: props.subject,
+       deadline_desc: props.description,
+       deadline_date: props.date
+      }]);
   }
 
   const handleSubjectChange = (e) => {
@@ -218,7 +231,6 @@ function Home() {
       </Modal>
 
       <div className="deadlines-area">
-        {/*<ul className="list-group">*/}
         {deadlines_list.map((deadline, index) => (
             <DeadlineListItem key={index} index={index} 
             deadline_name={deadline.deadline_name}
@@ -227,9 +239,9 @@ function Home() {
             deadline_desc={deadline.deadline_desc}
             deadline_date={deadline.deadline_date}
             deleteDeadline={deleteDeadline}
+            modifyDeadline={modifyDeadline}
              />
         ))}
-        {/*</ul>*/}
       </div>
          
     </div>
@@ -438,8 +450,14 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
 }
 
 function DeadlineListItem(props) {
+  const [subject, setSubject] = useState(props.deadline_subject);
+  const [task_name, setTaskName] = useState(props.deadline_name);
+  const [description, setDescription] = useState(props.deadline_desc);
+  const [date, setDate] = useState(new Date());
+
   const [modalErrorIsOpen, setModalErrorIsOpen] = useState(false);
   const [modalErrorMessage, setModalErrorMessage] = useState('');
+  const [modalModifyIsOpen, setModalModifyIsOpen] = useState(false);
 
   // Delete item from db and list
   const onDeleteClick = (e)=>{
@@ -462,6 +480,51 @@ function DeadlineListItem(props) {
       })
   }
 
+  // Update data in deadline
+  const onModifyClick = (e) => {
+    e.preventDefault();
+    let data = {
+      'deadline_id': props.deadline_id,
+      'subject': subject,
+      'task_name': task_name,
+      'description': description,
+      'date': date
+    }
+    authFetch('/api/update_deadline', {
+      method: 'post',
+      body: JSON.stringify(data)
+    }).then(r => r.json())
+      .then(res => {
+        if (res.message === "OK") {
+          props.modifyDeadline({
+            'deadline_id': props.deadline_id,
+            'subject': subject,
+            'task_name': task_name,
+            'description': description,
+            'date': res.deadline_date,
+            'index': props.index
+          });
+          setModalModifyIsOpen(false);
+        } else {
+          //setModalErrorMessage(res.message);
+          //setModalErrorIsOpen(true);
+          alert(res.message);
+        }
+      })
+  }
+
+  const handleSubjectChange = (e) => {
+    setSubject(e.target.value)
+  }
+
+  const handleTaskNameChange = (e) => {
+    setTaskName(e.target.value)
+  }
+
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value)
+  }
+
   return (    
       <div className="card w-75">
         <h5 className="card-header card-header-color-g">{props.deadline_name}</h5>
@@ -469,9 +532,80 @@ function DeadlineListItem(props) {
           <h5 className="card-title">{props.deadline_subject}</h5>
           <h6 className="card-subtitle mb-2 text-muted">{props.deadline_date}</h6>
           <p className="card-text">{props.deadline_desc}</p>
-          <button type="button" className="btn btn-primary" style={{marginRight: "1%"}}>Modify</button>
+          <button type="button" className="btn btn-primary" style={{marginRight: "1%"}} onClick={() => setModalModifyIsOpen(true)}>Modify</button>
           <button type="button" className="btn btn-danger" onClick={onDeleteClick}>Delete</button>
         </div>
+
+        <Modal isOpen={modalModifyIsOpen}
+          ariaHideApp={false}
+          onRequestClose={() => setModalModifyIsOpen(false)}
+          style={{
+            overlay: {
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(255, 255, 255, 0.75)'
+            },
+            content: {
+              position: 'absolute',
+              top: '15%',
+              left: '32%',
+              right: '32%',
+              bottom: '15%',
+              border: '1px solid #ccc',
+              background: '#fff',
+              overflow: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              borderRadius: '15px',
+              outline: 'none',
+              padding: '20px'
+            }
+          }}
+          >
+          <h2>Modify Deadline</h2>
+          
+          <form action="#">
+            <div className="mb-3">
+              <label htmlFor="subject-create" className="form-label">Subject</label>
+              <input type="text"
+                id="subject-create"
+                className="form-control"
+                onChange={handleSubjectChange}
+                value={subject}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="task-name-create" className="form-label">Task Name</label>
+              <input type="text"
+                id="task-name-create"
+                className="form-control"
+                onChange={handleTaskNameChange}
+                value={task_name}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="description-create" className="form-label">Description</label>
+              <textarea id="description-create"
+                className="form-control textarea-style "
+                onChange={handleDescriptionChange}
+                value={description}
+                rows='5'
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="deadline-date-create" className="form-label">Deadline Date </label>
+              <DatePicker selected={date} showTimeSelect
+              dateFormat="Pp" onChange={date => setDate(date)} />
+            </div>
+
+            <div>
+              <button className="btn btn-primary btn-st w-100" onClick={onModifyClick} type="submit">Modify deadline</button>
+            </div>
+          </form>
+
+        </Modal>
 
         <Modal isOpen={modalErrorIsOpen}
           onRequestClose={() => setModalErrorIsOpen(false)}
